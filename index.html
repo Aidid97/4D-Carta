@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta Matriks 4x4 & Analisis Pola</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #e9ecef;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .checkbox-group {
+            text-align: left;
+            margin: 5px 0 15px 0;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .btn-jana {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .btn-jana:hover {
+            background-color: #0056b3;
+        }
+        .btn-kocok {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .btn-kocok:hover {
+            background-color: #218838;
+        }
+        
+        /* Gaya Matriks 4x4 */
+        .matrix-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .matrix-table td {
+            border: 2px solid #333;
+            padding: 15px;
+            width: 25%;
+            background-color: #fff;
+        }
+        .matrix-table tr:first-child td {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Gaya Paparan Analisis */
+        .analysis-section {
+            text-align: left;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+        .analysis-section h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+            color: #333;
+        }
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .pattern-box {
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .pattern-name {
+            font-size: 12px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .pattern-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d9534f;
+            letter-spacing: 2px;
+        }
+        .mirror-value {
+            font-size: 14px;
+            color: #17a2b8;
+            margin-top: 5px;
+            display: block;
+            font-weight: bold;
+        }
+        .random-box {
+            background: #e2f0d9;
+            border: 1px solid #c8e1b7;
+        }
+        .random-box .pattern-value {
+            color: #385723;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Carta Matriks 4x4 (Formula -1)</h2>
+        
+        <label for="input4D" style="font-weight:bold; display:block; text-align:left; margin-bottom:5px;">Masukkan Nombor Asas (4 Digit):</label>
+        <input type="text" id="input4D" maxlength="4" placeholder="Cth: 5829" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        
+        <!-- Pilihan Formula Cermin -->
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" id="gunaCermin" checked onchange="kemaskiniCerminBilaTick()">
+                Guna Formula Cermin (0=5, 1=6...)
+            </label>
+        </div>
+
+        <button class="btn-jana" onclick="binaCarta()">Bina Carta & Analisa</button>
+        
+        <div id="resultContainer" style="display: none;">
+            <!-- Jadual 4x4 -->
+            <table class="matrix-table" id="matrixTable">
+                <!-- Dijana melalui JavaScript -->
+            </table>
+
+            <!-- Seksyen Analisis Pola 4D -->
+            <div class="analysis-section">
+                <h4>Analisis Pola 4D (L / T / Y / O)</h4>
+                <div class="pattern-grid">
+                    <div class="pattern-box">
+                        <span class="pattern-name">Pola L</span>
+                        <span class="pattern-value" id="polaL">-</span>
+                        <span class="mirror-value" id="polaL_Cermin"></span>
+                    </div>
+                    <div class="pattern-box">
+                        <span class="pattern-name">Pola T</span>
+                        <span class="pattern-value" id="polaT">-</span>
+                        <span class="mirror-value" id="polaT_Cermin"></span>
+                    </div>
+                    <div class="pattern-box">
+                        <span class="pattern-name">Pola Y</span>
+                        <span class="pattern-value" id="polaY">-</span>
+                        <span class="mirror-value" id="polaY_Cermin"></span>
+                    </div>
+                    <div class="pattern-box">
+                        <span class="pattern-name">Pola O (Kotak)</span>
+                        <span class="pattern-value" id="polaO">-</span>
+                        <span class="mirror-value" id="polaO_Cermin"></span>
+                    </div>
+                </div>
+
+                <!-- Seksyen Janaan 2D & 3D -->
+                <h4>Janaan Rawak (Dari Carta Matriks)</h4>
+                <div class="pattern-grid">
+                    <div class="pattern-box random-box">
+                        <span class="pattern-name">Kombinasi 2D</span>
+                        <span class="pattern-value" id="rawak2D">-</span>
+                    </div>
+                    <div class="pattern-box random-box">
+                        <span class="pattern-name">Kombinasi 3D</span>
+                        <span class="pattern-value" id="rawak3D">-</span>
+                    </div>
+                </div>
+                <button class="btn-kocok" onclick="janaRawak2D3D()">Kocok Semula 2D/3D</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalMatrix = [];
+        let globalPool = [];
+        let polaAsal = { L: "", T: "", Y: "", O: "" };
+
+        function getMirrorStr(str) {
+            const mirrors = {
+                '0': '5', '1': '6', '2': '7', '3': '8', '4': '9',
+                '5': '0', '6': '1', '7': '2', '8': '3', '9': '4'
+            };
+            let result = "";
+            for(let i = 0; i < str.length; i++) {
+                result += mirrors[str[i]] || str[i];
+            }
+            return result;
+        }
+
+        function binaCarta() {
+            let input = document.getElementById("input4D").value;
+            
+            if (input.length !== 4) {
+                alert("Sila masukkan tepat 4 digit nombor!");
+                return;
+            }
+
+            // Sediakan matriks baru
+            globalMatrix = [];
+            globalPool = [];
+            
+            // Baris 1: Nombor asas dimasukkan
+            let baris1 = input.split('').map(Number);
+            globalMatrix.push(baris1);
+            globalPool.push(...baris1);
+
+            // Baris 2, 3, dan 4: Formula tolak 1 (-1)
+            for (let r = 1; r < 4; r++) {
+                let barisBaru = [];
+                for (let c = 0; c < 4; c++) {
+                    let nilai = (globalMatrix[r-1][c] - 1 + 10) % 10;
+                    barisBaru.push(nilai);
+                    globalPool.push(nilai);
+                }
+                globalMatrix.push(barisBaru);
+            }
+
+            // Lukis jadual matriks
+            let tableHTML = "";
+            for (let r = 0; r < 4; r++) {
+                tableHTML += "<tr>";
+                for (let c = 0; c < 4; c++) {
+                    tableHTML += `<td>${globalMatrix[r][c]}</td>`;
+                }
+                tableHTML += "</tr>";
+            }
+            document.getElementById("matrixTable").innerHTML = tableHTML;
+
+            // Ekstrak & Papar Pola
+            ekstrakPola();
+
+            // Jana 2D/3D pertama kali
+            janaRawak2D3D();
+
+            // Tunjuk kontena keputusan
+            document.getElementById("resultContainer").style.display = "block";
+        }
+
+        function ekstrakPola() {
+            let m = globalMatrix;
+
+            // Pola L: 3 bawah, 1 kanan (Dari 0,0)
+            polaAsal.L = `${m[0][0]}${m[1][0]}${m[2][0]}${m[2][1]}`;
+            // Pola T: 3 melintang, 1 tegak tengah (Dari 0,0)
+            polaAsal.T = `${m[0][0]}${m[0][1]}${m[0][2]}${m[1][1]}`;
+            // Pola Y: Bentuk V bersambung ke bawah (Tengah di 1,1)
+            polaAsal.Y = `${m[0][0]}${m[0][2]}${m[1][1]}${m[2][1]}`;
+            // Pola O: Kotak 2x2 (Dari penjuru kanan bawah)
+            polaAsal.O = `${m[2][2]}${m[2][3]}${m[3][2]}${m[3][3]}`;
+
+            document.getElementById("polaL").innerText = polaAsal.L;
+            document.getElementById("polaT").innerText = polaAsal.T;
+            document.getElementById("polaY").innerText = polaAsal.Y;
+            document.getElementById("polaO").innerText = polaAsal.O;
+
+            // Kemaskini cermin
+            kemaskiniCerminBilaTick();
+        }
+
+        // Fungsi supaya paparan cermin bertukar terus apabila kotak di-tick/untick
+        function kemaskiniCerminBilaTick() {
+            let gunaCermin = document.getElementById("gunaCermin").checked;
+            
+            if (gunaCermin && globalMatrix.length > 0) {
+                document.getElementById("polaL_Cermin").innerText = "Cermin: " + getMirrorStr(polaAsal.L);
+                document.getElementById("polaT_Cermin").innerText = "Cermin: " + getMirrorStr(polaAsal.T);
+                document.getElementById("polaY_Cermin").innerText = "Cermin: " + getMirrorStr(polaAsal.Y);
+                document.getElementById("polaO_Cermin").innerText = "Cermin: " + getMirrorStr(polaAsal.O);
+            } else {
+                document.getElementById("polaL_Cermin").innerText = "";
+                document.getElementById("polaT_Cermin").innerText = "";
+                document.getElementById("polaY_Cermin").innerText = "";
+                document.getElementById("polaO_Cermin").innerText = "";
+            }
+        }
+
+        function janaRawak2D3D() {
+            if (globalPool.length === 0) return;
+
+            let gunaCermin = document.getElementById("gunaCermin").checked;
+            let kolamAktif = [...globalPool];
+
+            // Jika guna cermin, masukkan juga digit-digit cermin ke dalam kolam
+            if (gunaCermin) {
+                let kolamCermin = globalPool.map(num => parseInt(getMirrorStr(num.toString())));
+                kolamAktif = kolamAktif.concat(kolamCermin);
+            }
+
+            // Kocok kolam
+            let shuffled = kolamAktif.sort(() => 0.5 - Math.random());
+            
+            let hasil2D = `${shuffled[0]}${shuffled[1]}`;
+            let hasil3D = `${shuffled[2]}${shuffled[3]}${shuffled[4]}`;
+
+            document.getElementById("rawak2D").innerText = hasil2D;
+            document.getElementById("rawak3D").innerText = hasil3D;
+        }
+    </script>
+</body>
+</html>
