@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Matriks 4x4 Pro & Analisis Pintar</title>
+    <title>Sistem Matriks Pro & Saringan Pola Berpusat</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -48,7 +48,6 @@
         }
         .btn-jana:hover { background-color: #0b5ed7; }
         
-        /* Butang Tindakan */
         .action-group {
             display: flex;
             gap: 10px;
@@ -74,39 +73,41 @@
             flex: 1;
         }
         .btn-simpan:hover { background-color: #e0a800; }
-        .btn-reset {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            width: auto;
-            margin: 0;
-            font-weight: bold;
-        }
-        .btn-reset:hover { background: #c82333; }
         
-        /* Matriks 4x4 */
+        /* Matriks 4x4 & Highlight Mapping */
         .matrix-table {
             width: 100%;
             margin: 20px 0;
             border-collapse: collapse;
             font-size: 26px;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
         .matrix-table td {
             border: 2px solid #444;
             padding: 15px;
             width: 25%;
             background-color: #fff;
+            transition: all 0.3s ease;
+            position: relative;
         }
         .matrix-table tr:first-child td {
-            background-color: #cfe2ff;
-            color: #084298;
+            background-color: #e9ecef; /* Warna Baris Induk */
         }
-        .highlight-cell { background-color: #fff3cd !important; color: #856404; }
+        
+        /* Highlight Visual */
+        .highlight-box {
+            background-color: #fff3cd !important; /* Kuning: Kotak Pelengkap 2x2 */
+            color: #856404;
+        }
+        .highlight-3d { 
+            border: 4px solid #0d6efd !important; /* Biru: Laluan 3D */
+            box-shadow: inset 0 0 10px rgba(13,110,253,0.3);
+        }
+        .highlight-2d { 
+            border: 4px solid #dc3545 !important; /* Merah: Laluan 2D */
+            box-shadow: inset 0 0 10px rgba(220,53,69,0.3);
+        }
 
         /* Analisis Section */
         .analysis-section {
@@ -136,61 +137,46 @@
             border: 1px solid #ced4da;
             border-radius: 6px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .pattern-sumber {
+            font-size: 11px;
+            color: #fff;
+            background: #495057;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            display: inline-block;
         }
         .pattern-name {
             font-size: 12px;
             color: #6c757d;
             text-transform: uppercase;
             font-weight: bold;
-            display: block;
             margin-bottom: 5px;
         }
         .pattern-value {
-            font-size: 22px;
+            font-size: 26px;
             font-weight: bold;
-            color: #dc3545;
             letter-spacing: 2px;
         }
-        .mirror-value {
-            font-size: 14px;
-            color: #0dcaf0;
-            margin-top: 5px;
-            display: block;
-            font-weight: bold;
-        }
-        .btn-permutasi {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 5px;
-            font-size: 11px;
-            margin-top: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .permutasi-list {
-            display: none;
-            font-size: 12px;
-            color: #495057;
-            margin-top: 10px;
-            word-wrap: break-word;
-            background: #e9ecef;
-            padding: 5px;
-            border-radius: 4px;
-        }
         
-        /* Strategi Section */
+        /* Strategi Box (1D Dominan & Kotak Pelengkap) */
         .strategy-box {
             background: #e2e3e5;
             padding: 15px;
             border-radius: 6px;
             border-left: 5px solid #0d6efd;
             margin-bottom: 15px;
+            line-height: 1.6;
         }
         .strategy-box span { display: block; margin-bottom: 5px; }
         .hot-num { font-weight: bold; color: #b02a37; font-size: 18px;}
         .missing-num { font-weight: bold; color: #146c43; font-size: 18px;}
+        .info-text { font-size: 12px; color: #666; margin-top: 10px; display: block;}
 
         /* Rekod Section */
         .rekod-container {
@@ -230,9 +216,9 @@
 <body>
 
     <div class="container">
-        <h2>Sistem Matriks Pro & Analisis Pintar</h2>
+        <h2>Matriks Pro: Ekstraksi Berpusat</h2>
         
-        <label for="input4D" style="font-weight:bold; display:block; text-align:left; margin-bottom:5px;">Masukkan Nombor Asas (4 Digit):</label>
+        <label for="input4D" style="font-weight:bold; display:block; text-align:left; margin-bottom:5px;">Masukkan Nombor Induk 4D (Asas Matriks):</label>
         <input type="text" id="input4D" maxlength="4" placeholder="Cth: 5829" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         
         <div class="checkbox-group">
@@ -242,21 +228,56 @@
             </label>
         </div>
 
-        <button class="btn-jana" onclick="binaCarta()">Bina Carta & Analisa</button>
+        <button class="btn-jana" onclick="binaCarta()">Bina Carta Matriks & Analisa</button>
         
         <div id="resultContainer" style="display: none;">
+            
+            <p style="font-size:12px; color:#555; margin-bottom:0; font-weight:bold;">*Latar Kuning = Kotak Pelengkap. Bingkai Merah/Biru = Ekstraksi 2D/3D.</p>
             <table class="matrix-table" id="matrixTable"></table>
 
-            <!-- Analisis Strategi Pintar -->
+            <!-- BAHAGIAN STRATEGI ASAL (DIKEKALKAN SEPENUHNYA) -->
             <div class="analysis-section">
                 <h4>🎯 Analisis Strategi: 1D Dominan & Kotak Pelengkap</h4>
                 <div class="strategy-box">
-                    <span>🔥 1D Kerap Keluar (Hot Numbers): <span class="hot-num" id="hot1D">-</span></span>
-                    <span>🧩 Pasangan 2D Potensi: <span class="hot-num" id="hot2D">-</span></span>
+                    <span>🔥 1D Kerap Keluar (Hot Numbers):<br> <span class="hot-num" id="hot1D_paparan">-</span></span>
+                    <span>🧩 Pasangan 2D Potensi:<br> <span class="hot-num" id="hot2D_paparan">-</span></span>
                     <hr style="border:0; border-top:1px solid #ccc; margin:10px 0;">
                     <span>🔍 Analisis 1D Hilang (Melengkapkan Kotak 2x2):</span>
                     <span>Asas 3D: <strong id="asas3D">-</strong> | 1D Pelengkap: <span class="missing-num" id="pelengkap1D">-</span></span>
-                    <span style="font-size:12px; color:#666;">(Sasaran 4D Penuh: <strong id="sasaranPenuh" style="color:#000;">-</strong>)</span>
+                    <span style="font-size:13px; color:#555;">(Sasaran 4D Penuh: <strong id="sasaranPenuh" style="color:#000;">-</strong>)</span>
+                </div>
+            </div>
+
+            <!-- BAHAGIAN EKSTRAKSI BERASASKAN KOORDINAT MATRIKS & POLA -->
+            <div class="analysis-section" style="border: 2px solid #198754; background-color: #f8fff9;">
+                <h4 style="color: #198754; border-bottom-color: #198754;">✂️ Pengekstrakan 2D & 3D (Saringan Berpusat)</h4>
+                
+                <div class="pattern-grid">
+                    <div class="pattern-box" style="border-color:#dc3545; background:#fff5f5;">
+                        <span class="pattern-sumber" id="sumber2D">Sumber: -</span>
+                        <span class="pattern-name" style="color:#dc3545;">Potongan 2D</span>
+                        <span class="pattern-value" id="pola2D" style="color:#dc3545;">-</span>
+                    </div>
+                    <div class="pattern-box" style="border-color:#0d6efd; background:#f0f8ff;">
+                        <span class="pattern-sumber" id="sumber3D">Sumber: -</span>
+                        <span class="pattern-name" style="color:#0d6efd;">Potongan 3D</span>
+                        <span class="pattern-value" id="pola3D" style="color:#0d6efd;">-</span>
+                    </div>
+                </div>
+                
+                <div class="action-group">
+                    <button class="btn-kocok" onclick="janaBerdasarkanPola()">Ekstrak Semula (Tunjuk di Matriks)</button>
+                    <button class="btn-simpan" onclick="simpanRekod2D3D()">Simpan Rekod</button>
+                </div>
+                <span class="info-text">*Ekstraksi 2D/3D diwajibkan dipotong dari mana-mana susunan Pola 4D yang melintasi "1D Dominan", membuktikan ia tidak rawak.</span>
+
+                <!-- Paparan Log Rekod -->
+                <div id="rekodContainer" class="rekod-container">
+                    <div class="rekod-header">
+                        <strong>Log Simpanan Ekstraksi</strong>
+                        <button class="btn-reset" onclick="resetRekod2D3D()">Reset</button>
+                    </div>
+                    <ul id="senaraiRekod" class="rekod-list"></ul>
                 </div>
             </div>
 
@@ -265,38 +286,10 @@
                 <h4>📊 Analisis Pola 4D Utama</h4>
                 <div class="pattern-grid" id="polaGridUtama"></div>
 
-                <h4>📈 Analisis Pola Tambahan</h4>
+                <h4>📈 Pola Tambahan (Penjuru & Zig-Zag)</h4>
                 <div class="pattern-grid" id="polaGridTambahan"></div>
-                
-                <h4>🎲 Janaan Rawak Saringan (2D & 3D)</h4>
-                <div class="pattern-grid">
-                    <div class="pattern-box" style="background:#d1e7dd;">
-                        <span class="pattern-name">2D Silang</span>
-                        <span class="pattern-value" id="rawak2D">-</span>
-                    </div>
-                    <div class="pattern-box" style="background:#d1e7dd;">
-                        <span class="pattern-name">3D Rawak</span>
-                        <span class="pattern-value" id="rawak3D">-</span>
-                    </div>
-                </div>
-                
-                <!-- Butang Tindakan 2D/3D -->
-                <div class="action-group">
-                    <button class="btn-kocok" onclick="janaRawak2D3D()">Kocok Semula</button>
-                    <button class="btn-simpan" onclick="simpanRekod2D3D()">Simpan Rekod</button>
-                </div>
-
-                <!-- Paparan Log Rekod -->
-                <div id="rekodContainer" class="rekod-container">
-                    <div class="rekod-header">
-                        <strong>Log Simpanan 2D & 3D</strong>
-                        <button class="btn-reset" onclick="resetRekod2D3D()">Reset</button>
-                    </div>
-                    <ul id="senaraiRekod" class="rekod-list">
-                        <!-- Senarai rekod dimasukkan melalui JavaScript -->
-                    </ul>
-                </div>
             </div>
+
         </div>
     </div>
 
@@ -304,37 +297,26 @@
         let globalMatrix = [];
         let globalPool = [];
         let senaraiPola = {};
+        let hot1D_Global = ""; // Disimpan sebagai Pusat Graviti pengekstrakan
 
         function getMirrorStr(str) {
             const mirrors = {'0':'5','1':'6','2':'7','3':'8','4':'9','5':'0','6':'1','7':'2','8':'3','9':'4'};
             return str.split('').map(char => mirrors[char] || char).join('');
         }
 
-        function dapatkanPermutasi(str) {
-            let results = [];
-            if (str.length === 1) return [str];
-            for (let i = 0; i < str.length; i++) {
-                let firstChar = str[i];
-                let charsLeft = str.substring(0, i) + str.substring(i + 1);
-                let innerPermutations = dapatkanPermutasi(charsLeft);
-                for (let j = 0; j < innerPermutations.length; j++) {
-                    results.push(firstChar + innerPermutations[j]);
-                }
-            }
-            return [...new Set(results)];
-        }
-
         function binaCarta() {
             let input = document.getElementById("input4D").value;
-            if (input.length !== 4) { alert("Sila masukkan tepat 4 digit nombor!"); return; }
+            if (input.length !== 4) { alert("Sila masukkan tepat 4 digit nombor Induk 4D!"); return; }
 
             globalMatrix = [];
             globalPool = [];
             
+            // Baris 1: Masukkan Induk 4D
             let baris1 = input.split('').map(Number);
             globalMatrix.push(baris1);
             globalPool.push(...baris1);
 
+            // Bina carta matriks (Formula -1)
             for (let r = 1; r < 4; r++) {
                 let barisBaru = [];
                 for (let c = 0; c < 4; c++) {
@@ -346,9 +328,9 @@
             }
 
             lukisJadual();
-            ekstrakSemuaPola();
-            analisisStrategiPintar();
-            janaRawak2D3D();
+            analisisStrategiLengkap(); // Memanggil fungsi strategi 1D & 2x2
+            ekstrakSemuaPola(); 
+            janaBerdasarkanPola(); // Ekstrak 2D/3D pertama
 
             document.getElementById("resultContainer").style.display = "block";
         }
@@ -364,78 +346,28 @@
             }
             document.getElementById("matrixTable").innerHTML = tableHTML;
         }
+        
+        // FUNGSI DIKEKALKAN: Strategi 1D, 2D Potensi, dan Kotak Pelengkap 2x2
+        function analisisStrategiLengkap() {
+            // Bersihkan highlight lama
+            document.querySelectorAll('td').forEach(td => {
+                td.classList.remove('highlight-box', 'highlight-3d', 'highlight-2d');
+            });
 
-        function ekstrakSemuaPola() {
-            let m = globalMatrix;
-            
-            senaraiPola.Utama = {
-                "Pola L": `${m[0][0]}${m[1][0]}${m[2][0]}${m[2][1]}`,
-                "Pola T": `${m[0][0]}${m[0][1]}${m[0][2]}${m[1][1]}`,
-                "Pola Y": `${m[0][0]}${m[0][2]}${m[1][1]}${m[2][1]}`,
-                "Pola O (Kotak)": `${m[1][1]}${m[1][2]}${m[2][1]}${m[2][2]}`
-            };
-
-            senaraiPola.Tambahan = {
-                "Pepenjuru 1": `${m[0][0]}${m[1][1]}${m[2][2]}${m[3][3]}`,
-                "Pepenjuru 2": `${m[0][3]}${m[1][2]}${m[2][1]}${m[3][0]}`,
-                "Zig-Zag Kiri": `${m[0][0]}${m[1][1]}${m[2][0]}${m[3][1]}`,
-                "Zig-Zag Kanan": `${m[0][3]}${m[1][2]}${m[2][3]}${m[3][2]}`
-            };
-
-            binaUI_Pola("polaGridUtama", senaraiPola.Utama);
-            binaUI_Pola("polaGridTambahan", senaraiPola.Tambahan);
-        }
-
-        function binaUI_Pola(containerId, polaObj) {
-            let html = "";
-            let gunaCermin = document.getElementById("gunaCermin").checked;
-
-            for (const [nama, nilai] of Object.entries(polaObj)) {
-                let permutasi = dapatkanPermutasi(nilai);
-                let cerminStr = gunaCermin ? getMirrorStr(nilai) : "";
-                let permutasiCermin = gunaCermin ? dapatkanPermutasi(cerminStr) : [];
-                
-                let paparPermutasi = permutasi.join(', ');
-                if(gunaCermin) paparPermutasi += `<br><br><strong>I-Box Cermin:</strong><br>` + permutasiCermin.join(', ');
-
-                html += `
-                <div class="pattern-box">
-                    <span class="pattern-name">${nama}</span>
-                    <span class="pattern-value">${nilai}</span>
-                    <span class="mirror-value">${cerminStr ? 'Cermin: ' + cerminStr : ''}</span>
-                    <button class="btn-permutasi" onclick="togglePermutasi(this)">Lihat Susunan I-Box</button>
-                    <div class="permutasi-list">${paparPermutasi}</div>
-                </div>`;
-            }
-            document.getElementById(containerId).innerHTML = html;
-        }
-
-        function togglePermutasi(btn) {
-            let list = btn.nextElementSibling;
-            if (list.style.display === "block") {
-                list.style.display = "none";
-                btn.innerText = "Lihat Susunan I-Box";
-            } else {
-                list.style.display = "block";
-                btn.innerText = "Tutup Susunan";
-            }
-        }
-
-        function kemaskiniUI() {
-            if (globalMatrix.length > 0) ekstrakSemuaPola();
-        }
-
-        function analisisStrategiPintar() {
+            // 1. Cari Angka Dominan
             let kiraan = {};
             globalPool.forEach(num => kiraan[num] = (kiraan[num] || 0) + 1);
-            
             let susunanKekerapan = Object.entries(kiraan).sort((a, b) => b[1] - a[1]);
+            
             let hot1 = susunanKekerapan[0][0]; 
             let hot2 = susunanKekerapan[1] ? susunanKekerapan[1][0] : hot1;
+            
+            hot1D_Global = hot1; // Set ke dalam memori untuk sistem saringan 2D/3D
+            
+            document.getElementById("hot1D_paparan").innerText = `${hot1} & ${hot2}`;
+            document.getElementById("hot2D_paparan").innerText = `${hot1}${hot2} / ${hot2}${hot1}`;
 
-            document.getElementById("hot1D").innerText = `${hot1} & ${hot2}`;
-            document.getElementById("hot2D").innerText = `${hot1}${hot2} / ${hot2}${hot1}`;
-
+            // 2. Cari Analisis 1D Hilang (Kotak 2x2 Pertama yang ada Hot1)
             let m = globalMatrix;
             let kotakDitemui = false;
             let r_asas = 0, c_asas = 0;
@@ -456,62 +388,111 @@
                 let d1 = m[r_asas][c_asas];
                 let d2 = m[r_asas][c_asas+1];
                 let d3 = m[r_asas+1][c_asas];
-                let pelengkap = m[r_asas+1][c_asas+1];
+                let pelengkap = m[r_asas+1][c_asas+1]; // Digit bawah kanan
 
                 document.getElementById("asas3D").innerText = `${d1}${d2}${d3}`;
                 document.getElementById("pelengkap1D").innerText = pelengkap;
                 document.getElementById("sasaranPenuh").innerText = `${d1}${d2}${d3}${pelengkap}`;
                 
-                document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-cell'));
-                document.getElementById(`cell-${r_asas}-${c_asas}`).classList.add('highlight-cell');
-                document.getElementById(`cell-${r_asas}-${c_asas+1}`).classList.add('highlight-cell');
-                document.getElementById(`cell-${r_asas+1}-${c_asas}`).classList.add('highlight-cell');
-                document.getElementById(`cell-${r_asas+1}-${c_asas+1}`).classList.add('highlight-cell');
+                // Warnakan latar kuning (highlight-box)
+                document.getElementById(`cell-${r_asas}-${c_asas}`).classList.add('highlight-box');
+                document.getElementById(`cell-${r_asas}-${c_asas+1}`).classList.add('highlight-box');
+                document.getElementById(`cell-${r_asas+1}-${c_asas}`).classList.add('highlight-box');
+                document.getElementById(`cell-${r_asas+1}-${c_asas+1}`).classList.add('highlight-box');
             }
         }
 
-        function janaRawak2D3D() {
-            if (globalPool.length === 0) return;
+        function ekstrakSemuaPola() {
+            let m = globalMatrix;
+            
+            senaraiPola.Utama = {
+                "Pola L": { val: `${m[0][0]}${m[1][0]}${m[2][0]}${m[2][1]}`, coords: [[0,0], [1,0], [2,0], [2,1]] },
+                "Pola T": { val: `${m[0][0]}${m[0][1]}${m[0][2]}${m[1][1]}`, coords: [[0,0], [0,1], [0,2], [1,1]] },
+                "Pola Y": { val: `${m[0][0]}${m[0][2]}${m[1][1]}${m[2][1]}`, coords: [[0,0], [0,2], [1,1], [2,1]] },
+                "Pola O (Kotak)": { val: `${m[1][1]}${m[1][2]}${m[2][1]}${m[2][2]}`, coords: [[1,1], [1,2], [2,1], [2,2]] }
+            };
+
+            senaraiPola.Tambahan = {
+                "Pepenjuru 1": { val: `${m[0][0]}${m[1][1]}${m[2][2]}${m[3][3]}`, coords: [[0,0], [1,1], [2,2], [3,3]] },
+                "Pepenjuru 2": { val: `${m[0][3]}${m[1][2]}${m[2][1]}${m[3][0]}`, coords: [[0,3], [1,2], [2,1], [3,0]] },
+                "Zig-Zag Kiri": { val: `${m[0][0]}${m[1][1]}${m[2][0]}${m[3][1]}`, coords: [[0,0], [1,1], [2,0], [3,1]] },
+                "Zig-Zag Kanan": { val: `${m[0][3]}${m[1][2]}${m[2][3]}${m[3][2]}`, coords: [[0,3], [1,2], [2,3], [3,2]] }
+            };
+
+            binaUI_Pola("polaGridUtama", senaraiPola.Utama);
+            binaUI_Pola("polaGridTambahan", senaraiPola.Tambahan);
+        }
+
+        function binaUI_Pola(containerId, polaObj) {
+            let html = "";
             let gunaCermin = document.getElementById("gunaCermin").checked;
-            let kolamAktif = [...globalPool];
 
-            if (gunaCermin) {
-                let kolamCermin = globalPool.map(num => parseInt(getMirrorStr(num.toString())));
-                kolamAktif = kolamAktif.concat(kolamCermin);
+            for (const [nama, data] of Object.entries(polaObj)) {
+                let nilai = data.val;
+                let cerminStr = gunaCermin ? getMirrorStr(nilai) : "";
+                
+                html += `
+                <div class="pattern-box">
+                    <span class="pattern-name">${nama}</span>
+                    <span class="pattern-value" style="color:#333;">${nilai}</span>
+                    <span style="font-size:12px; color:#17a2b8; margin-top:5px; font-weight:bold;">${cerminStr ? 'Cermin: ' + cerminStr : ''}</span>
+                </div>`;
+            }
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function kemaskiniUI() {
+            if (globalMatrix.length > 0) ekstrakSemuaPola();
+        }
+
+        // FUNGSI PENGEKSTRAKAN BERPUSAT (TIDAK RAWAK, PATUH POLA, LALU PUSAT)
+        function janaBerdasarkanPola() {
+            let semuaPola = Object.assign({}, senaraiPola.Utama, senaraiPola.Tambahan);
+            let polaBerpusat = {};
+            
+            // Saringan Utama: Pastikan Pola 4D mengandungi 1D Dominan (Pusat Graviti)
+            for (const [nama, data] of Object.entries(semuaPola)) {
+                if (data.val.includes(hot1D_Global)) {
+                    polaBerpusat[nama] = data;
+                }
+            }
+            
+            // Talian hayat jika matriks ganjil dan tiada pola mengena (sangat jarang)
+            if (Object.keys(polaBerpusat).length === 0) polaBerpusat = semuaPola;
+
+            let namaPola = Object.keys(polaBerpusat);
+            if (namaPola.length === 0) return;
+
+            let gunaCermin = document.getElementById("gunaCermin").checked;
+
+            // Bersihkan hanya border 2D & 3D, kekalkan warna kuning highlight-box
+            document.querySelectorAll('td').forEach(td => {
+                td.classList.remove('highlight-3d', 'highlight-2d');
+            });
+
+            // --- EKSTRAK 3D ---
+            let k3D = namaPola[Math.floor(Math.random() * namaPola.length)];
+            let data3D = polaBerpusat[k3D];
+            let mula3D = Math.floor(Math.random() * 2); // mula index 0 atau 1
+            
+            let val3D = data3D.val.substring(mula3D, mula3D + 3);
+            let coords3D = data3D.coords.slice(mula3D, mula3D + 3); 
+            let label3D = k3D;
+
+            if (gunaCermin && Math.random() > 0.5) {
+                val3D = getMirrorStr(val3D);
+                label3D += " (Cermin)";
             }
 
-            let shuffled = [...new Set(kolamAktif)].sort(() => 0.5 - Math.random()); 
-            if(shuffled.length < 5) shuffled = kolamAktif.sort(() => 0.5 - Math.random());
+            // --- EKSTRAK 2D ---
+            let k2D = namaPola[Math.floor(Math.random() * namaPola.length)];
+            let data2D = polaBerpusat[k2D];
+            let mula2D = Math.floor(Math.random() * 3); // mula index 0, 1, atau 2
+            
+            let val2D = data2D.val.substring(mula2D, mula2D + 2);
+            let coords2D = data2D.coords.slice(mula2D, mula2D + 2); 
+            let label2D = k2D;
 
-            document.getElementById("rawak2D").innerText = `${shuffled[0]}${shuffled[1]}`;
-            document.getElementById("rawak3D").innerText = `${shuffled[2]}${shuffled[3]}${shuffled[4]}`;
-        }
-
-        // --- FUNGSI REKOD BARU ---
-        function simpanRekod2D3D() {
-            let val2D = document.getElementById("rawak2D").innerText;
-            let val3D = document.getElementById("rawak3D").innerText;
-            
-            if (val2D === "-" || val3D === "-") return; // Tolak jika belum dijana
-            
-            let senarai = document.getElementById("senaraiRekod");
-            let masa = new Date().toLocaleTimeString('ms-MY', { hour12: false });
-            
-            let li = document.createElement("li");
-            li.innerHTML = `
-                <span style="color:#888; font-size:11px;">[${masa}]</span> 
-                <span><strong>2D:</strong> <span style="color:#dc3545; font-size:16px;">${val2D}</span></span>
-                <span><strong>3D:</strong> <span style="color:#0d6efd; font-size:16px;">${val3D}</span></span>
-            `;
-            
-            senarai.prepend(li); // Masukkan senarai terbaru di kedudukan paling atas
-            document.getElementById("rekodContainer").style.display = "block"; // Paparkan ruangan rekod
-        }
-
-        function resetRekod2D3D() {
-            document.getElementById("senaraiRekod").innerHTML = ""; // Padam semua senarai
-            document.getElementById("rekodContainer").style.display = "none"; // Sembunyikan ruangan rekod
-        }
-    </script>
-</body>
-</html>
+            if (gunaCermin && Math.random() > 0.5) {
+                val2D = getMirrorStr(val2D);
+                label
