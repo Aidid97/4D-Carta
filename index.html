@@ -478,8 +478,168 @@ function salin(id) {
     const txt = document.getElementById(id).getAttribute('data-raw');
     if (txt) {
         navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
+    }function highlightStrategyBox(m, hot1D, golden1D) {
+    document.querySelectorAll('td').forEach(td => td.className = "");
+    let found = false;
+    for (let r = 0; r < 3; r++) { 
+        for (let c = 0; c < 3; c++) { 
+            let block = [m[r][c], m[r][c + 1], m[r + 1][c], m[r + 1][c + 1]];
+            if (block.includes(parseInt(hot1D))) {
+                [`c-${r}-${c}`, `c-${r}-${c+1}`, `c-${r+1}-${c}`, `c-${r+1}-${c+1}`].forEach(id => {
+                    let el = document.getElementById(id);
+                    if (el) el.classList.add('highlight-box');
+                });
+                found = true;
+                break;
+            } 
+        } 
+        if (found) break; 
+    }
+}
+
+function kocokPolaVisual() {
+    if (!globalHasil) return;
+    let pObj = globalHasil.polaObj;
+    let keys = Object.keys(pObj);
+    let gunaCermin = document.getElementById("useMirror").checked;
+
+    document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-3d', 'highlight-2d'));
+
+    let k3 = keys[Math.floor(Math.random() * keys.length)];
+    let d3 = pObj[k3];
+    let m3 = Math.floor(Math.random() * 2);
+    let v3 = d3.v.substr(m3, 3);
+    let c3 = d3.c.slice(m3, m3 + 3);
+    let l3 = k3;
+    if (gunaCermin && Math.random() > 0.5) { v3 = enjin.getMirror(v3); l3 += " (Cermin)"; }
+
+    let k2 = keys[Math.floor(Math.random() * keys.length)];
+    let d2 = pObj[k2];
+    let m2 = Math.floor(Math.random() * 3);
+    let v2 = d2.v.substr(m2, 2);
+    let c2 = d2.c.slice(m2, m2 + 2);
+    let l2 = k2;
+    if (gunaCermin && Math.random() > 0.5) { v2 = enjin.getMirror(v2); l2 += " (Cermin)"; }
+
+    document.getElementById("src3D").innerText = `Pola: ${l3} [${d3.v}]`; 
+    document.getElementById("val3D").innerText = v3;
+    document.getElementById("src2D").innerText = `Pola: ${l2} [${d2.v}]`; 
+    document.getElementById("val2D").innerText = v2;
+
+    c3.forEach(c => {
+        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
+        if (el) el.classList.add('highlight-3d');
+    });
+    c2.forEach(c => {
+        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
+        if (el) el.classList.add('highlight-2d');
+    });
+}
+
+function renderPolaGrid(pObj, gunaCermin) {
+    let html = "";
+    for (let [n, d] of Object.entries(pObj)) {
+        html += `<div class="pattern-box">
+            <span class="pattern-name">${n}</span>
+            <span class="pattern-value">${d.v}</span>
+            <span style="font-size:11px;color:#17a2b8;font-weight:bold;">${gunaCermin ? 'Cermin: ' + enjin.getMirror(d.v) : ''}</span>
+        </div>`;
+    }
+    document.getElementById("gridPola").innerHTML = html;
+}
+
+function resetBorang() {
+    document.getElementById('num1').value = '';
+    document.getElementById('num2').value = '';
+    document.getElementById('history').value = '';
+    document.getElementById('hasil').style.display = 'none';
+    globalHasil = null;
+}
+function highlightStrategyBox(m, hot1D, golden1D) {
+    document.querySelectorAll('td').forEach(td => td.className = "");
+    let found = false;
+    for (let r = 0; r < 3; r++) { 
+        for (let c = 0; c < 3; c++) { 
+            let block = [m[r][c], m[r][c + 1], m[r + 1][c], m[r + 1][c + 1]];
+            if (block.includes(parseInt(hot1D))) {
+                [`c-${r}-${c}`, `c-${r}-${c+1}`, `c-${r+1}-${c}`, `c-${r+1}-${c+1}`].forEach(id => {
+                    let el = document.getElementById(id);
+                    if (el) el.classList.add('highlight-box');
+                });
+                found = true;
+                break;
+            } 
+        } 
+        if (found) break; 
+    }
+}
+
+function kocokPolaVisual() {
+    if (!globalHasil) return;
+    let pObj = globalHasil.polaObj;
+    let keys = Object.keys(pObj);
+    let gunaCermin = document.getElementById("useMirror").checked;
+
+    document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-3d', 'highlight-2d'));
+
+    let k3 = keys[Math.floor(Math.random() * keys.length)];
+    let d3 = pObj[k3];
+    let m3 = Math.floor(Math.random() * 2);
+    let v3 = d3.v.substr(m3, 3);
+    let c3 = d3.c.slice(m3, m3 + 3);
+    let l3 = k3;
+    if (gunaCermin && Math.random() > 0.5) { v3 = enjin.getMirror(v3); l3 += " (Cermin)"; }
+
+    let k2 = keys[Math.floor(Math.random() * keys.length)];
+    let d2 = pObj[k2];
+    let m2 = Math.floor(Math.random() * 3);
+    let v2 = d2.v.substr(m2, 2);
+    let c2 = d2.c.slice(m2, m2 + 2);
+    let l2 = k2;
+    if (gunaCermin && Math.random() > 0.5) { v2 = enjin.getMirror(v2); l2 += " (Cermin)"; }
+
+    document.getElementById("src3D").innerText = `Pola: ${l3} [${d3.v}]`; 
+    document.getElementById("val3D").innerText = v3;
+    document.getElementById("src2D").innerText = `Pola: ${l2} [${d2.v}]`; 
+    document.getElementById("val2D").innerText = v2;
+
+    c3.forEach(c => {
+        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
+        if (el) el.classList.add('highlight-3d');
+    });
+    c2.forEach(c => {
+        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
+        if (el) el.classList.add('highlight-2d');
+    });
+}
+
+function renderPolaGrid(pObj, gunaCermin) {
+    let html = "";
+    for (let [n, d] of Object.entries(pObj)) {
+        html += `<div class="pattern-box">
+            <span class="pattern-name">${n}</span>
+            <span class="pattern-value">${d.v}</span>
+            <span style="font-size:11px;color:#17a2b8;font-weight:bold;">${gunaCermin ? 'Cermin: ' + enjin.getMirror(d.v) : ''}</span>
+        </div>`;
+    }
+    document.getElementById("gridPola").innerHTML = html;
+}
+
+function resetBorang() {
+    document.getElementById('num1').value = '';
+    document.getElementById('num2').value = '';
+    document.getElementById('history').value = '';
+    document.getElementById('hasil').style.display = 'none';
+    globalHasil = null;
+}
+
+function salin(id) {
+    const txt = document.getElementById(id).getAttribute('data-raw');
+    if (txt) {
+        navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
     }
 }
 </script>
 </body>
 </html>
+
