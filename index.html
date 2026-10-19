@@ -1,355 +1,109 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Mesin Matriks Multi-Operator Pro</title>
-<style>
-body{font-family:sans-serif;background:#f0f2f5;color:#1c1e21;margin:0;padding:12px;display:flex;justify-content:center}
-.container{background:#fff;padding:16px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.15);max-width:540px;width:100%}
-h2{text-align:center;color:#1a365d;margin:0 0 4px;font-size:20px}
-p.sub{text-align:center;color:#718096;font-size:11px;margin:0 0 12px}
-.ig{margin-bottom:10px;text-align:left}
-label{display:block;margin-bottom:3px;font-weight:600;font-size:12px}
-input[type="text"],textarea,select{width:100%;padding:8px;border:2px solid #cbd5e0;border-radius:6px;box-sizing:border-box;font-size:14px;font-family:monospace}
-select{font-family:sans-serif;font-weight:bold;cursor:pointer}
-textarea{font-size:12px;resize:vertical}
-.ck{text-align:left;margin:8px 0;font-size:12px;font-weight:600;background:#f8f9fa;padding:6px;border-radius:6px;border:1px solid #e2e8f0}
-.bg{display:flex;gap:6px;margin-top:8px}
-button{flex:1;padding:9px;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer}
-.bj{background:#0d6efd;color:#fff}
-.br{background:#dc3545;color:#fff}
-.bk{background:#198754;color:#fff;width:100%;margin-top:6px}
-.bc{background:#38a169;color:#fff;font-size:10px;padding:2px 5px;border-radius:3px;float:right;border:none;cursor:pointer}
-.mt{width:100%;margin:8px 0;border-collapse:collapse;font-size:22px;font-weight:bold}
-.mt td{border:2px solid #4a5568;padding:8px;width:25%;background:#fff;text-align:center}
-.mt tr:first-child td{background-color:#e2e8f0}
-.hb{background-color:#fff3cd !important;color:#856404}
-.h3{border:3px solid #0d6efd !important}
-.h2{border:3px solid #dc3545 !important}
-.rb{margin-top:10px;padding:10px;background:#f8fafc;border-left:4px solid #3182ce;border-radius:6px;text-align:left}
-.ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(65px,1fr));gap:5px;margin-top:6px}
-.nt{background:#2d3748;color:#fff;padding:5px 0;text-align:center;border-radius:4px;font-weight:bold;font-family:monospace;font-size:14px}
-.kt{color:#dd6b20;font-weight:800;font-size:16px}
-.at{background:#2b6cb0}
-.bm{display:inline-block;padding:2px 5px;border-radius:3px;font-size:10px;font-weight:bold;color:#fff;background:#805ad5;margin-left:4px}
-.sb{background:#edf2f7;padding:10px;border-radius:6px;border-left:4px solid #0d6efd;line-height:1.4;text-align:left;margin-top:8px}
-.hn{font-weight:bold;color:#b02a37;font-size:15px}
-.mn{font-weight:bold;color:#146c43;font-size:15px}
-.pg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
-.pb{background:#fff;padding:6px;border:1px solid #cbd5e0;border-radius:4px;text-align:center;display:flex;flex-direction:column}
-.ps{font-size:9px;color:#fff;background:#4a5568;padding:2px;border-radius:3px;margin-bottom:2px;font-weight:bold}
-.pn{font-size:10px;color:#718096;font-weight:bold;text-transform:uppercase}
-.pv{font-size:18px;font-weight:bold;letter-spacing:1px;color:#2d3748}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesin Matriks Multi-Operator Pro</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-<h2>Matriks Multi-Operator Pro</h2>
-<p class="sub">Penjanaan Presisi Tinggi (SportsToto, Magnum 4D & GD Lotto)</p>
-<div class="ig">
-<label for="operator">Pilih Operator / Pasaran:</label>
-<select id="operator">
-<option value="toto">SportsToto (Mod Kestabilan Trajektori)</option>
-<option value="magnum" selected>Magnum 4D (Mod Cermin & Frekuensi Seimbang)</option>
-<option value="gdlotto">GD Lotto (Mod Drift Pantas Harian)</option>
-</select>
-</div>
-<div class="ig">
-<label for="num1">Nombor Induk / Dasar 1 (Contoh: 3594):</label>
-<input type="text" id="num1" maxlength="4" placeholder="0000" pattern="\d*" required>
-</div>
-<div class="ig">
-<label for="num2">Nombor Induk / Dasar 2 (Contoh: 8040):</label>
-<input type="text" id="num2" maxlength="4" placeholder="0000" pattern="\d*">
-</div>
-<div class="ig">
-<label for="history">Sejarah Cabutan Lepas (Paste Result):</label>
-<textarea id="history" rows="3" placeholder="Paste result lepas di sini...&#10;Contoh: 1508, 5241, 6336, 2203, 4065..."></textarea>
-</div>
-<div class="ck">
-<label style="cursor:pointer;"><input type="checkbox" id="useMirror" checked> Aktifkan Formula Cermin (0↔5, 1↔6, 2↔7, 3↔8, 4↔9)</label>
-</div>
-<div class="bg">
-<button class="bj" onclick="janaKeputusan()">Bina Carta & Analisa</button>
-<button class="br" onclick="resetBorang()">Reset</button>
-</div>
-<div id="hasil" style="display:none;">
-<div class="rb" style="border-left-color:#4a5568;">
-<p style="margin:0;font-weight:bold;font-size:12px;color:#2d3748;">📊 Visual Matriks 4x4 (Pola Dynamic Grid)</p>
-<p style="font-size:10px;font-weight:bold;color:#718096;margin:2px 0 4px;">*Kotak Kuning = Kotak Pelengkap. Bingkai Merah/Biru = Ekstraksi Path.</p>
-<table class="mt" id="matrixTable"></table>
-</div>
-<div class="rb">
-<p style="margin:0;"><strong>Kunci Matriks Dominan:</strong> <span id="master-key" class="kt"></span> <span id="mode-badge" class="bm"></span></p>
-<p id="pivot-info" style="margin:3px 0 0;font-size:11px;color:#2c5282;">
-<strong>Digit Pivot Utama (Mean Reversion):</strong> <span id="pivot-keys" style="font-weight:bold;"></span>
-</p>
-</div>
-<div class="sb">
-<p style="margin:0 0 4px;font-weight:bold;color:#1a365d;font-size:13px;border-bottom:1px solid #cbd5e0;padding-bottom:3px;">🎯 Strategy Core: 3D Muktamad & 1D Pelengkap Emas</p>
-<span>🔥 1D Dominan (Hot): <span class="hn" id="h1D">-</span></span><br>
-<span>🧩 2D Tunjang: <span class="hn" id="h2D">-</span></span>
-<hr style="border-top:1px dashed #cbd5e0;margin:4px 0;">
-<span>🔍 3D Muktamad (Solid Core): <strong id="a3D" style="font-size:16px;color:#0d6efd;">-</strong> | 1D Pelengkap: <span class="mn" id="p1D">-</span></span><br>
-<span>🎯 Target Utama 4D: <strong id="s4D" style="font-size:18px;color:#805ad5;">-</strong></span>
-</div>
-<div class="rb">
-<p style="margin:0;"><strong>2D Anchor Solid (Tunjang)</strong> <button class="bc" onclick="salin('out-2d')">Salin 2D</button></p>
-<div id="out-2d" class="ng"></div>
-</div>
-<div class="rb" style="border-left-color:#d69e2e;">
-<p style="margin:0;"><strong>Proyeksi 3D Muktamad (Solid Core)</strong> <button class="bc" style="background:#d69e2e;" onclick="salin('out-3d')">Salin 3D</button></p>
-<div id="out-3d" class="ng"></div>
-</div>
-<div class="rb" style="border-left-color:#805ad5;">
-<p style="margin:0;"><strong>Proyeksi 4D iBox (3D Muktamad + Golden 1D)</strong> <button class="bc" style="background:#805ad5;" onclick="salin('out-4d')">Salin 4D</button></p>
-<div id="out-4d" class="ng"></div>
-</div>
-<div class="rb" style="border-left-color:#198754;background:#f0fff4;">
-<p style="margin:0;font-weight:bold;color:#198754;">✂️ Pengekstrakan Pola Matriks Visual</p>
-<div class="pg">
-<div class="pb" style="border-color:#dc3545;background:#fff5f5;">
-<span class="ps" id="src2D">-</span><span class="pn" style="color:#dc3545;">Potongan 2D</span><span class="pv" id="val2D" style="color:#dc3545;">-</span>
-</div>
-<div class="pb" style="border-color:#0d6efd;background:#f0f8ff;">
-<span class="ps" id="src3D">-</span><span class="pn" style="color:#0d6efd;">Potongan 3D</span><span class="pv" id="val3D" style="color:#0d6efd;">-</span>
-</div>
-</div>
-<button class="bk" onclick="kocokPolaVisual()">Kocok & Tunjuk Path Matriks</button>
-</div>
-<div class="rb" style="border-left-color:#4a5568;">
-<p style="margin:0;font-weight:bold;">📊 Pola Visual Matriks (Utama & Tambahan)</p>
-<div class="pg" id="gridPola"></div>
-</div>
-</div>
-</div>
-<script>
-class MesinMatriksPro {
-constructor() {
-this.M = {'0':'5','1':'6','2':'7','3':'8','4':'9','5':'0','6':'1','7':'2','8':'3','9':'4'};
-}
-sortCombo(s) {
-return s.split('').sort().join('');
-}
-getMirror(s) {
-return s.split('').map(c => this.M[c] || c).join('');
-}
-binaMatrix4x4(s1, s2) {
-let cb = (s1 + (s2 || "8040")).replace(/[^0-9]/g, '');
-if (cb.length < 4) cb = "5829";
-let br = cb.substring(0, 4).split('').map(Number);
-let m = [br];
-for (let r = 1; r < 4; r++) {
-let row = [];
-for (let c = 0; c < 4; c++) row.push((m[r - 1][c] + 9) % 10);
-m.push(row);
-}
-return m;
-}
-uraiAkar(na) {
-let d = na.split('').map(Number);
-let sum = d.reduce((a, b) => a + b, 0);
-let sumStr = sum.toString();
-let sumDigits = sumStr.split('').map(Number);
-let cTmb = sumDigits.reduce((a, b) => a + b, 0);
-let cTlk = sumDigits.length > 1 ? Math.abs(sumDigits[0] - sumDigits[1]) : sumDigits[0];
-let rd = na + sumStr + cTmb.toString() + cTlk.toString();
-return { akar: sum, cabangTolak: cTlk.toString(), cabangTambah: cTmb.toString(), rawData: rd };
-}
-kiraTrajektori(sh, op) {
-let skor = [];
-let t3 = sh.slice(0, 3).join('');
-let t5 = sh.slice(0, 5).join('');
-let t15 = sh.slice(0, 15).join('');
-let wm = (op === 'gdlotto') ? 0.7 : (op === 'magnum' ? 0.55 : 0.5);
-let wv = (op === 'gdlotto') ? 0.3 : (op === 'magnum' ? 0.45 : 0.5);
-for (let i = 0; i <= 9; i++) {
-let d = i.toString();
-let fm = t3.split(d).length - 1;
-let c5 = t5.split(d).length - 1;
-let c15 = t15.split(d).length - 1;
-let hj = (c5 / 5.0) - (c15 / 15.0);
-skor.push({ digit: d, skor: (wm * fm) + (wv * hj) });
-}
-return skor.sort((a, b) => b.skor - a.skor).map(x => x.digit);
-}
-ekstrakPolaMatrix(m) {
-return {
-"Pola L": { v: `${m[0][0]}${m[1][0]}${m[2][0]}${m[2][1]}`, c: [[0,0],[1,0],[2,0],[2,1]] },
-"Pola T": { v: `${m[0][0]}${m[0][1]}${m[0][2]}${m[1][1]}`, c: [[0,0],[0,1],[0,2],[1,1]] },
-"Pola Y": { v: `${m[0][0]}${m[0][2]}${m[1][1]}${m[2][1]}`, c: [[0,0],[0,2],[1,1],[2,1]] },
-"Pola O": { v: `${m[1][1]}${m[1][2]}${m[2][1]}${m[2][2]}`, c: [[1,1],[1,2],[2,1],[2,2]] },
-"Pepenjuru 1": { v: `${m[0][0]}${m[1][1]}${m[2][2]}${m[3][3]}`, c: [[0,0],[1,1],[2,2],[3,3]] },
-"Pepenjuru 2": { v: `${m[0][3]}${m[1][2]}${m[2][1]}${m[3][0]}`, c: [[0,3],[1,2],[2,1],[3,0]] },
-"Zig Kiri": { v: `${m[0][0]}${m[1][1]}${m[2][0]}${m[3][1]}`, c: [[0,0],[1,1],[2,0],[3,1]] },
-"Zig Kanan": { v: `${m[0][3]}${m[1][2]}${m[2][3]}${m[3][2]}`, c: [[0,3],[1,2],[2,3],[3,2]] }
-};
-}
-cariPelengkapEmasPro(k3d, da, cp) {
-let pt = [];
-if (!k3d.includes(da.cabangTolak)) pt.push(da.cabangTolak);
-if (cp.length > 0 && !k3d.includes(cp[0])) pt.push(cp[0]);
-k3d.split('').forEach(d => {
-let cm = this.M[d];
-if (!k3d.includes(cm) && da.rawData.includes(cm)) pt.push(cm);
-});
-cp.slice(1).forEach(p => { if (!k3d.includes(p)) pt.push(p); });
-return [...new Set(pt)];
-}
-jana(na, s2, sh, gc, op) {
-let matrix = this.binaMatrix4x4(na, s2);
-let da = this.uraiAkar(na + (s2 || ""));
-let tr = this.kiraTrajektori(sh, op);
-let hd = tr.slice(0, 4);
-let cp = (op === 'gdlotto' || op === 'magnum') ? tr.slice(-4) : tr.slice(-3);
-let hot1D = hd[0];
-let hot2DP = hd[0] + hd[1];
-let a2d = new Set();
-for (let i = 0; i < hd.length; i++) {
-for (let j = i + 1; j < hd.length; j++) a2d.add(this.sortCombo(hd[i] + hd[j]));
-}
-if (gc) hd.forEach(d => a2d.add(this.sortCombo(d + this.M[d])));
-let arr2D = Array.from(a2d);
-let c3d = new Set();
-let p3d = this.sortCombo(hd.slice(0, 3).join(''));
-c3d.add(p3d);
-if (gc) {
-hd.slice(0, 3).forEach(d => {
-c3d.add(this.sortCombo(p3d.replace(d, this.M[d])));
-});
-}
-arr2D.forEach(a => {
-cp.slice(0, 2).forEach(p => c3d.add(this.sortCombo(a + p)));
-});
-let arr3D = Array.from(c3d).slice(0, 8);
-let solid3D = arr3D[0] || "149";
-let s4d = new Set();
-let g1dList = [];
-arr3D.forEach(k => {
-let sp = this.cariPelengkapEmasPro(k, da, cp);
-if (sp.length > 0) g1dList.push(...sp);
-sp.forEach(p => s4d.add(this.sortCombo(k + p)));
-});
-let sg1D = da.cabangTolak;
-if (solid3D.includes(sg1D)) sg1D = cp[0];
-if (solid3D.includes(sg1D)) sg1D = g1dList.find(d => !solid3D.includes(d)) || "2";
-return {
-matrix: matrix, tunjang: hd, pivot: cp, hot1D: hot1D,
-hot2DPair: hot2DP, solidCore3D: solid3D, golden1D: sg1D,
-target4D: this.sortCombo(solid3D + sg1D),
-keputusan2D: arr2D, keputusan3D: arr3D,
-keputusan4D: Array.from(s4d).slice(0, 16),
-polaObj: this.ekstrakPolaMatrix(matrix)
-};
-}
-}
-const enjin = new MesinMatriksPro();
-let globalHasil = null;
-function janaKeputusan() {
-const s1 = document.getElementById('num1').value.trim();
-const s2 = document.getElementById('num2').value.trim();
-const hr = document.getElementById('history').value.trim();
-const gc = document.getElementById('useMirror').checked;
-const op = document.getElementById('operator').value;
-if (s1.length < 3) { alert("Masukkan nombor induk valid."); return; }
-let sh = hr.match(/\b\d{4}\b/g);
-if (!sh || sh.length < 3) sh = ["1508","5241","6336","2203","4065","2464","0431","2182","2275","9055"];
-globalHasil = enjin.jana(s1, s2, sh, gc, op);
-lukisJadual(globalHasil.matrix);
-highlightStrategyBox(globalHasil.matrix, globalHasil.hot1D);
-document.getElementById('master-key').innerText = globalHasil.tunjang.join(' - ');
-document.getElementById('pivot-keys').innerText = globalHasil.pivot.join(', ');
-document.getElementById('mode-badge').innerText = op.toUpperCase();
-document.getElementById('h1D').innerText = `${globalHasil.hot1D} & ${globalHasil.tunjang[1]}`;
-document.getElementById('h2D').innerText = `${globalHasil.hot2DPair} / ${globalHasil.sortCombo(globalHasil.hot2DPair)}`;
-document.getElementById('a3D').innerText = globalHasil.solidCore3D;
-document.getElementById('p1D').innerText = globalHasil.golden1D;
-document.getElementById('s4D').innerText = globalHasil.target4D;
-document.getElementById('out-2d').innerHTML = globalHasil.keputusan2D.map(n => `<div class="nt at">${n}</div>`).join('');
-document.getElementById('out-2d').setAttribute('data-raw', globalHasil.keputusan2D.join(', '));
-document.getElementById('out-3d').innerHTML = globalHasil.keputusan3D.map(n => `<div class="nt" style="background:#d69e2e;">${n}</div>`).join('');
-document.getElementById('out-3d').setAttribute('data-raw', globalHasil.keputusan3D.join(', '));
-document.getElementById('out-4d').innerHTML = globalHasil.keputusan4D.map(n => `<div class="nt" style="background:#805ad5;">${n}</div>`).join('');
-document.getElementById('out-4d').setAttribute('data-raw', globalHasil.keputusan4D.join(', '));
-renderPolaGrid(globalHasil.polaObj, gc);
-kocokPolaVisual();
-document.getElementById('hasil').style.display = 'block';
-}
-function lukisJadual(m) {
-let h = "";
-for (let r = 0; r < 4; r++) {
-h += "<tr>";
-for (let c = 0; c < 4; c++) h += `<td id="c-${r}-${c}">${m[r][c]}</td>`;
-h += "</tr>";
-}
-document.getElementById("matrixTable").innerHTML = h;
-}
-function highlightStrategyBox(m, hot1D) {
-document.querySelectorAll('td').forEach(td => td.className = "");
-let found = false;
-for (let r = 0; r < 3; r++) {
-for (let c = 0; c < 3; c++) {
-let block = [m[r][c], m[r][c + 1], m[r + 1][c], m[r + 1][c + 1]];
-if (block.includes(parseInt(hot1D))) {
-[`c-${r}-${c}`, `c-${r}-${c+1}`, `c-${r+1}-${c}`, `c-${r+1}-${c+1}`].forEach(id => {
-let el = document.getElementById(id);
-if (el) el.classList.add('hb');
-});
-found = true; break;
-}
-}
-if (found) break;
-}
-}
-function kocokPolaVisual() {
-if (!globalHasil) return;
-let pObj = globalHasil.polaObj;
-let keys = Object.keys(pObj);
-let gc = document.getElementById("useMirror").checked;
-document.querySelectorAll('td').forEach(td => td.classList.remove('h3', 'h2'));
-let k3 = keys[Math.floor(Math.random() * keys.length)];
-let d3 = pObj[k3];
-let m3 = Math.floor(Math.random() * 2);
-let v3 = d3.v.substr(m3, 3);
-let c3 = d3.c.slice(m3, m3 + 3);
-let l3 = k3;
-if (gc && Math.random() > 0.5) { v3 = enjin.getMirror(v3); l3 += " (Cermin)"; }
-let k2 = keys[Math.floor(Math.random() * keys.length)];
-let d2 = pObj[k2];
-let m2 = Math.floor(Math.random() * 3);
-let v2 = d2.v.substr(m2, 2);
-let c2 = d2.c.slice(m2, m2 + 2);
-let l2 = k2;
-if (gc && Math.random() > 0.5) { v2 = enjin.getMirror(v2); l2 += " (Cermin)"; }
-document.getElementById("src3D").innerText = `Pola: ${l3} [${d3.v}]`;
-document.getElementById("val3D").innerText = v3;
-document.getElementById("src2D").innerText = `Pola: ${l2} [${d2.v}]`;
-document.getElementById("val2D").innerText = v2;
-c3.forEach(c => { let el = document.getElementById(`c-${c[0]}-${c[1]}`); if (el) el.classList.add('h3'); });
-c2.forEach(c => { let el = document.getElementById(`c-${c[0]}-${c[1]}`); if (el) el.classList.add('h2'); });
-}
-function renderPolaGrid(pObj, gc) {
-let html = "";
-for (let [n, d] of Object.entries(pObj)) {
-html += `<div class="pb"><span class="pn">${n}</span><span class="pv">${d.v}</span><span style="font-size:10px;color:#17a2b8;font-weight:bold;">${gc ? 'Cermin: ' + enjin.getMirror(d.v) : ''}</span></div>`;
-}
-document.getElementById("gridPola").innerHTML = html;
-}
-function resetBorang() {
-document.getElementById('num1').value = '';
-document.getElementById('num2').value = '';
-document.getElementById('history').value = '';
-document.getElementById('hasil').style.display = 'none';
-globalHasil = null;
-}
-function salin(id) {
-const txt = document.getElementById(id).getAttribute('data-raw');
-if (txt) navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
-}
-</script>
 
-<!-- Skrip Iklan Adsterra Baharu -->
-<script data-cfasync="false" src="https://bauval.org/14/8ed7ff2149891600bc1774052ca193b4"></script>
+<div class="container">
+    <h2>Matriks Multi-Operator Pro</h2>
+    <p class="subtitle">Penjanaan Presisi Tinggi (SportsToto, Magnum 4D & GD Lotto)</p>
+    
+    <div class="input-group">
+        <label for="operator">Pilih Operator / Pasaran:</label>
+        <select id="operator">
+            <option value="toto">SportsToto (Mod Kestabilan Trajektori)</option>
+            <option value="magnum" selected>Magnum 4D (Mod Cermin & Frekuensi Seimbang)</option>
+            <option value="gdlotto">GD Lotto (Mod Drift Pantas Harian)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="num1">Nombor Induk / Dasar 1 (Contoh: 3594):</label>
+        <input type="text" id="num1" maxlength="4" placeholder="0000" pattern="\d*" required>
+    </div>
+    
+    <div class="input-group">
+        <label for="num2">Nombor Induk / Dasar 2 (Contoh: 8040):</label>
+        <input type="text" id="num2" maxlength="4" placeholder="0000" pattern="\d*">
+    </div>
+
+    <div class="input-group">
+        <label for="history">Sejarah Cabutan Lepas (Paste Result):</label>
+        <textarea id="history" rows="3" placeholder="Paste result lepas di sini...&#10;Contoh: 1508, 5241, 6336, 2203, 4065..."></textarea>
+    </div>
+
+    <div class="checkbox-group">
+        <label style="cursor:pointer;"><input type="checkbox" id="useMirror" checked> Aktifkan Formula Cermin (0↔5, 1↔6, 2↔7, 3↔8, 4↔9)</label>
+    </div>
+    
+    <div class="btn-group">
+        <button class="btn-jana" onclick="janaKeputusan()">Bina Carta & Analisa</button>
+        <button class="btn-reset" onclick="resetBorang()">Reset</button>
+    </div>
+
+    <div id="hasil" style="display: none;">
+        <div class="result-box" style="border-left-color: #4a5568;">
+            <p style="margin:0; font-weight:bold; font-size:13px; color:#2d3748;">📊 Visual Matriks 4x4 (Pola Dynamic Grid)</p>
+            <p style="font-size:11px; font-weight:bold; color:#718096; margin-top:2px; margin-bottom:8px;">*Kotak Kuning = Kotak Pelengkap Muktamad. Bingkai Merah/Biru = Ekstraksi Active Path.</p>
+            <table class="matrix-table" id="matrixTable"></table>
+        </div>
+
+        <div class="result-box">
+            <p style="margin:0;"><strong>Kunci Matriks Dominan:</strong> <span id="master-key" class="key-tag"></span> <span id="mode-badge" class="badge-mode"></span></p>
+            <p id="pivot-info" style="margin-top:5px; margin-bottom:0; font-size:12px; color:#2c5282;">
+                <strong>Digit Pivot Utama (Mean Reversion):</strong> <span id="pivot-keys" style="font-weight:bold;"></span>
+            </p>
+        </div>
+
+        <div class="strategy-box">
+            <p style="margin:0; font-weight:bold; color:#1a365d; font-size:14px; border-bottom:1px solid #cbd5e0; padding-bottom:5px; margin-bottom:8px;">🎯 Strategy Core: 3D Muktamad & 1D Pelengkap Emas</p>
+            <span>🔥 1D Dominan (Hot): <span class="hot-num" id="h1D">-</span></span><br>
+            <span>🧩 2D Tunjang: <span class="hot-num" id="h2D">-</span></span>
+            <hr style="border-top:1px dashed #cbd5e0; margin:8px 0;">
+            <span>🔍 3D Muktamad (Solid Core): <strong id="a3D" style="font-size:17px; color:#0d6efd;">-</strong> | 1D Pelengkap: <span class="missing-num" id="p1D">-</span></span><br>
+            <span>🎯 Target Utama 4D: <strong id="s4D" style="font-size:19px; color:#805ad5;">-</strong></span>
+        </div>
+
+        <div class="result-box">
+            <p style="margin:0;"><strong>2D Anchor Solid (Tunjang)</strong> <button class="btn-copy" onclick="salin('out-2d')">Salin 2D</button></p>
+            <div id="out-2d" class="number-grid"></div>
+        </div>
+
+        <div class="result-box" style="border-left-color: #d69e2e;">
+            <p style="margin:0;"><strong>Proyeksi 3D Muktamad (Solid Core)</strong> <button class="btn-copy" style="background:#d69e2e;" onclick="salin('out-3d')">Salin 3D</button></p>
+            <div id="out-3d" class="number-grid"></div>
+        </div>
+
+        <div class="result-box" style="border-left-color: #805ad5;">
+            <p style="margin:0;"><strong>Proyeksi 4D iBox (3D Muktamad + Golden 1D)</strong> <button class="btn-copy" style="background:#805ad5;" onclick="salin('out-4d')">Salin 4D</button></p>
+            <div id="out-4d" class="number-grid"></div>
+        </div>
+
+        <div class="result-box" style="border-left-color: #198754; background:#f0fff4;">
+            <p style="margin:0; font-weight:bold; color:#198754;">✂️ Pengekstrakan Pola Matriks Visual</p>
+            <div class="pattern-grid">
+                <div class="pattern-box" style="border-color:#dc3545; background:#fff5f5;">
+                    <span class="pattern-sumber" id="src2D">-</span><span class="pattern-name" style="color:#dc3545;">Potongan 2D</span><span class="pattern-value" id="val2D" style="color:#dc3545;">-</span>
+                </div>
+                <div class="pattern-box" style="border-color:#0d6efd; background:#f0f8ff;">
+                    <span class="pattern-sumber" id="src3D">-</span><span class="pattern-name" style="color:#0d6efd;">Potongan 3D</span><span class="pattern-value" id="val3D" style="color:#0d6efd;">-</span>
+                </div>
+            </div>
+            <button class="btn-kocok" onclick="kocokPolaVisual()">Kocok & Tunjuk Path Matriks</button>
+        </div>
+
+        <div class="result-box" style="border-left-color: #4a5568;">
+            <p style="margin:0; font-weight:bold;">📊 Pola Visual Matriks (Utama & Tambahan)</p>
+            <div class="pattern-grid" id="gridPola"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Sambutan fail JavaScript luaran -->
+<script src="script.js"></script>
 </body>
 </html>
