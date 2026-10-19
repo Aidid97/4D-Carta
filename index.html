@@ -17,13 +17,16 @@ textarea{font-size:12px;resize:vertical}
 .ck{text-align:left;margin:8px 0;font-size:12px;font-weight:600;background:#f8f9fa;padding:6px;border-radius:6px;border:1px solid #e2e8f0}
 .bg{display:flex;gap:6px;margin-top:8px}
 button{flex:1;padding:9px;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer}
-.bj{background:#0d6efd;color:#fff}.br{background:#dc3545;color:#fff}.bk{background:#198754;color:#fff;width:100%;margin-top:6px}
+.bj{background:#0d6efd;color:#fff}
+.br{background:#dc3545;color:#fff}
+.bk{background:#198754;color:#fff;width:100%;margin-top:6px}
 .bc{background:#38a169;color:#fff;font-size:10px;padding:2px 5px;border-radius:3px;float:right;border:none;cursor:pointer}
 .mt{width:100%;margin:8px 0;border-collapse:collapse;font-size:22px;font-weight:bold}
 .mt td{border:2px solid #4a5568;padding:8px;width:25%;background:#fff;text-align:center}
 .mt tr:first-child td{background-color:#e2e8f0}
 .hb{background-color:#fff3cd !important;color:#856404}
-.h3{border:3px solid #0d6efd !important}.h2{border:3px solid #dc3545 !important}
+.h3{border:3px solid #0d6efd !important}
+.h2{border:3px solid #dc3545 !important}
 .rb{margin-top:10px;padding:10px;background:#f8fafc;border-left:4px solid #3182ce;border-radius:6px;text-align:left}
 .ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(65px,1fr));gap:5px;margin-top:6px}
 .nt{background:#2d3748;color:#fff;padding:5px 0;text-align:center;border-radius:4px;font-weight:bold;font-family:monospace;font-size:14px}
@@ -31,7 +34,8 @@ button{flex:1;padding:9px;border:none;border-radius:6px;font-size:13px;font-weig
 .at{background:#2b6cb0}
 .bm{display:inline-block;padding:2px 5px;border-radius:3px;font-size:10px;font-weight:bold;color:#fff;background:#805ad5;margin-left:4px}
 .sb{background:#edf2f7;padding:10px;border-radius:6px;border-left:4px solid #0d6efd;line-height:1.4;text-align:left;margin-top:8px}
-.hn{font-weight:bold;color:#b02a37;font-size:15px}.mn{font-weight:bold;color:#146c43;font-size:15px}
+.hn{font-weight:bold;color:#b02a37;font-size:15px}
+.mn{font-weight:bold;color:#146c43;font-size:15px}
 .pg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
 .pb{background:#fff;padding:6px;border:1px solid #cbd5e0;border-radius:4px;text-align:center;display:flex;flex-direction:column}
 .ps{font-size:9px;color:#fff;background:#4a5568;padding:2px;border-radius:3px;margin-bottom:2px;font-weight:bold}
@@ -125,8 +129,12 @@ class MesinMatriksPro {
 constructor() {
 this.M = {'0':'5','1':'6','2':'7','3':'8','4':'9','5':'0','6':'1','7':'2','8':'3','9':'4'};
 }
-sortCombo(s) { return s.split('').sort().join(''); }
-getMirror(s) { return s.split('').map(c => this.M[c] || c).join(''); }
+sortCombo(s) {
+return s.split('').sort().join('');
+}
+getMirror(s) {
+return s.split('').map(c => this.M[c] || c).join('');
+}
 binaMatrix4x4(s1, s2) {
 let cb = (s1 + (s2 || "8040")).replace(/[^0-9]/g, '');
 if (cb.length < 4) cb = "5829";
@@ -238,7 +246,6 @@ polaObj: this.ekstrakPolaMatrix(matrix)
 }
 const enjin = new MesinMatriksPro();
 let globalHasil = null;
-
 function janaKeputusan() {
 const s1 = document.getElementById('num1').value.trim();
 const s2 = document.getElementById('num2').value.trim();
@@ -269,7 +276,6 @@ renderPolaGrid(globalHasil.polaObj, gc);
 kocokPolaVisual();
 document.getElementById('hasil').style.display = 'block';
 }
-
 function lukisJadual(m) {
 let h = "";
 for (let r = 0; r < 4; r++) {
@@ -279,7 +285,6 @@ h += "</tr>";
 }
 document.getElementById("matrixTable").innerHTML = h;
 }
-
 function highlightStrategyBox(m, hot1D) {
 document.querySelectorAll('td').forEach(td => td.className = "");
 let found = false;
@@ -297,7 +302,6 @@ found = true; break;
 if (found) break;
 }
 }
-
 function kocokPolaVisual() {
 if (!globalHasil) return;
 let pObj = globalHasil.polaObj;
@@ -325,7 +329,6 @@ document.getElementById("val2D").innerText = v2;
 c3.forEach(c => { let el = document.getElementById(`c-${c[0]}-${c[1]}`); if (el) el.classList.add('h3'); });
 c2.forEach(c => { let el = document.getElementById(`c-${c[0]}-${c[1]}`); if (el) el.classList.add('h2'); });
 }
-
 function renderPolaGrid(pObj, gc) {
 let html = "";
 for (let [n, d] of Object.entries(pObj)) {
@@ -333,7 +336,6 @@ html += `<div class="pb"><span class="pn">${n}</span><span class="pv">${d.v}</sp
 }
 document.getElementById("gridPola").innerHTML = html;
 }
-
 function resetBorang() {
 document.getElementById('num1').value = '';
 document.getElementById('num2').value = '';
@@ -341,13 +343,13 @@ document.getElementById('history').value = '';
 document.getElementById('hasil').style.display = 'none';
 globalHasil = null;
 }
-
 function salin(id) {
 const txt = document.getElementById(id).getAttribute('data-raw');
 if (txt) navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
 }
 </script>
 
+<!-- Skrip Iklan Adsterra Baharu -->
 <script data-cfasync="false" src="https://bauval.org/14/8ed7ff2149891600bc1774052ca193b4"></script>
 </body>
 </html>
