@@ -141,6 +141,7 @@
         </div>
     </div>
 </div>
+
 <script>
 class MesinMatriksPro {
     constructor() {
@@ -235,7 +236,7 @@ class MesinMatriksPro {
         };
     }
 
-    cariPelengkapEmasPro(kombinasi3D, dataAkar, coldPivot) {
+    cariPelengkapEmasPro(kombinasi3D, dataAkar, coldPivot, gunaCermin) {
         let pelengkapTier = [];
 
         if (!kombinasi3D.includes(dataAkar.cabangTolak)) {
@@ -286,22 +287,37 @@ class MesinMatriksPro {
         }
         let array2D = Array.from(anchors2D);
 
+        let core3DSet = new Set();
         let primary3D = this.sortCombo(hotDigits.slice(0, 3).join(''));
-        let solidCore3D = primary3D;
-        if (gunaCermin && dataAkar.rawData.includes(this.MIRROR_MAP[hotDigits[0]])) {
-            solidCore3D = this.sortCombo(primary3D.replace(hotDigits[0], this.MIRROR_MAP[hotDigits[0]]));
+        core3DSet.add(primary3D);
+
+        if (gunaCermin) {
+            hotDigits.slice(0, 3).forEach(d => {
+                let mirrorD = this.MIRROR_MAP[d];
+                let alt3D = this.sortCombo(primary3D.replace(d, mirrorD));
+                core3DSet.add(alt3D);
+            });
         }
 
-        let array3DMuktamad = [solidCore3D];
+        array2D.forEach(anchor => {
+            coldPivot.slice(0, 2).forEach(pivot => {
+                core3DSet.add(this.sortCombo(anchor + pivot));
+            });
+        });
+
+        let array3DMuktamad = Array.from(core3DSet).slice(0, 8);
+        let solidCore3D = array3DMuktamad[0] || "149";
 
         let set4D = new Set();
         let golden1DList = [];
 
         array3DMuktamad.forEach(kombo3D => {
-            let senaraiPelengkap = this.cariPelengkapEmasPro(kombo3D, dataAkar, coldPivot);
+            let senaraiPelengkap = this.cariPelengkapEmasPro(kombo3D, dataAkar, coldPivot, gunaCermin);
+            
             if (senaraiPelengkap.length > 0) {
                 golden1DList.push(...senaraiPelengkap);
             }
+
             senaraiPelengkap.forEach(p => {
                 set4D.add(this.sortCombo(kombo3D + p));
             });
@@ -328,7 +344,7 @@ class MesinMatriksPro {
             target4D: target4D,
             keputusan2D: array2D,
             keputusan3D: array3DMuktamad,
-            keputusan4D: Array.from(set4D),
+            keputusan4D: Array.from(set4D).slice(0, 16),
             polaObj: this.ekstrakPolaMatrix(matrix)
         };
     }
@@ -381,7 +397,7 @@ function janaKeputusan() {
     renderPolaGrid(globalHasil.polaObj, gunaCermin);
     kocokPolaVisual();
 
-    document.getElementById('hasil').style.display = 'block';
+        document.getElementById('hasil').style.display = 'block';
 }
 
 function lukisJadual(m) {
@@ -478,169 +494,8 @@ function salin(id) {
     const txt = document.getElementById(id).getAttribute('data-raw');
     if (txt) {
         navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
-    }function highlightStrategyBox(m, hot1D, golden1D) {
-    document.querySelectorAll('td').forEach(td => td.className = "");
-    let found = false;
-    for (let r = 0; r < 3; r++) { 
-        for (let c = 0; c < 3; c++) { 
-            let block = [m[r][c], m[r][c + 1], m[r + 1][c], m[r + 1][c + 1]];
-            if (block.includes(parseInt(hot1D))) {
-                [`c-${r}-${c}`, `c-${r}-${c+1}`, `c-${r+1}-${c}`, `c-${r+1}-${c+1}`].forEach(id => {
-                    let el = document.getElementById(id);
-                    if (el) el.classList.add('highlight-box');
-                });
-                found = true;
-                break;
-            } 
-        } 
-        if (found) break; 
-    }
-}
-
-function kocokPolaVisual() {
-    if (!globalHasil) return;
-    let pObj = globalHasil.polaObj;
-    let keys = Object.keys(pObj);
-    let gunaCermin = document.getElementById("useMirror").checked;
-
-    document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-3d', 'highlight-2d'));
-
-    let k3 = keys[Math.floor(Math.random() * keys.length)];
-    let d3 = pObj[k3];
-    let m3 = Math.floor(Math.random() * 2);
-    let v3 = d3.v.substr(m3, 3);
-    let c3 = d3.c.slice(m3, m3 + 3);
-    let l3 = k3;
-    if (gunaCermin && Math.random() > 0.5) { v3 = enjin.getMirror(v3); l3 += " (Cermin)"; }
-
-    let k2 = keys[Math.floor(Math.random() * keys.length)];
-    let d2 = pObj[k2];
-    let m2 = Math.floor(Math.random() * 3);
-    let v2 = d2.v.substr(m2, 2);
-    let c2 = d2.c.slice(m2, m2 + 2);
-    let l2 = k2;
-    if (gunaCermin && Math.random() > 0.5) { v2 = enjin.getMirror(v2); l2 += " (Cermin)"; }
-
-    document.getElementById("src3D").innerText = `Pola: ${l3} [${d3.v}]`; 
-    document.getElementById("val3D").innerText = v3;
-    document.getElementById("src2D").innerText = `Pola: ${l2} [${d2.v}]`; 
-    document.getElementById("val2D").innerText = v2;
-
-    c3.forEach(c => {
-        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
-        if (el) el.classList.add('highlight-3d');
-    });
-    c2.forEach(c => {
-        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
-        if (el) el.classList.add('highlight-2d');
-    });
-}
-
-function renderPolaGrid(pObj, gunaCermin) {
-    let html = "";
-    for (let [n, d] of Object.entries(pObj)) {
-        html += `<div class="pattern-box">
-            <span class="pattern-name">${n}</span>
-            <span class="pattern-value">${d.v}</span>
-            <span style="font-size:11px;color:#17a2b8;font-weight:bold;">${gunaCermin ? 'Cermin: ' + enjin.getMirror(d.v) : ''}</span>
-        </div>`;
-    }
-    document.getElementById("gridPola").innerHTML = html;
-}
-
-function resetBorang() {
-    document.getElementById('num1').value = '';
-    document.getElementById('num2').value = '';
-    document.getElementById('history').value = '';
-    document.getElementById('hasil').style.display = 'none';
-    globalHasil = null;
-}
-function highlightStrategyBox(m, hot1D, golden1D) {
-    document.querySelectorAll('td').forEach(td => td.className = "");
-    let found = false;
-    for (let r = 0; r < 3; r++) { 
-        for (let c = 0; c < 3; c++) { 
-            let block = [m[r][c], m[r][c + 1], m[r + 1][c], m[r + 1][c + 1]];
-            if (block.includes(parseInt(hot1D))) {
-                [`c-${r}-${c}`, `c-${r}-${c+1}`, `c-${r+1}-${c}`, `c-${r+1}-${c+1}`].forEach(id => {
-                    let el = document.getElementById(id);
-                    if (el) el.classList.add('highlight-box');
-                });
-                found = true;
-                break;
-            } 
-        } 
-        if (found) break; 
-    }
-}
-
-function kocokPolaVisual() {
-    if (!globalHasil) return;
-    let pObj = globalHasil.polaObj;
-    let keys = Object.keys(pObj);
-    let gunaCermin = document.getElementById("useMirror").checked;
-
-    document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-3d', 'highlight-2d'));
-
-    let k3 = keys[Math.floor(Math.random() * keys.length)];
-    let d3 = pObj[k3];
-    let m3 = Math.floor(Math.random() * 2);
-    let v3 = d3.v.substr(m3, 3);
-    let c3 = d3.c.slice(m3, m3 + 3);
-    let l3 = k3;
-    if (gunaCermin && Math.random() > 0.5) { v3 = enjin.getMirror(v3); l3 += " (Cermin)"; }
-
-    let k2 = keys[Math.floor(Math.random() * keys.length)];
-    let d2 = pObj[k2];
-    let m2 = Math.floor(Math.random() * 3);
-    let v2 = d2.v.substr(m2, 2);
-    let c2 = d2.c.slice(m2, m2 + 2);
-    let l2 = k2;
-    if (gunaCermin && Math.random() > 0.5) { v2 = enjin.getMirror(v2); l2 += " (Cermin)"; }
-
-    document.getElementById("src3D").innerText = `Pola: ${l3} [${d3.v}]`; 
-    document.getElementById("val3D").innerText = v3;
-    document.getElementById("src2D").innerText = `Pola: ${l2} [${d2.v}]`; 
-    document.getElementById("val2D").innerText = v2;
-
-    c3.forEach(c => {
-        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
-        if (el) el.classList.add('highlight-3d');
-    });
-    c2.forEach(c => {
-        let el = document.getElementById(`c-${c[0]}-${c[1]}`);
-        if (el) el.classList.add('highlight-2d');
-    });
-}
-
-function renderPolaGrid(pObj, gunaCermin) {
-    let html = "";
-    for (let [n, d] of Object.entries(pObj)) {
-        html += `<div class="pattern-box">
-            <span class="pattern-name">${n}</span>
-            <span class="pattern-value">${d.v}</span>
-            <span style="font-size:11px;color:#17a2b8;font-weight:bold;">${gunaCermin ? 'Cermin: ' + enjin.getMirror(d.v) : ''}</span>
-        </div>`;
-    }
-    document.getElementById("gridPola").innerHTML = html;
-}
-
-function resetBorang() {
-    document.getElementById('num1').value = '';
-    document.getElementById('num2').value = '';
-    document.getElementById('history').value = '';
-    document.getElementById('hasil').style.display = 'none';
-    globalHasil = null;
-}
-
-function salin(id) {
-    const txt = document.getElementById(id).getAttribute('data-raw');
-    if (txt) {
-        navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
     }
 }
 </script>
 </body>
 </html>
-
-
