@@ -99,7 +99,7 @@
         </div>
 
         <div class="strategy-box">
-            <p style="margin:0; font-weight:bold; color:#1a365d; font-size:14px; border-bottom:1px solid #cbd5e0; padding-bottom:5px; margin-bottom:8px;">🎯 Strategy Core: 3D Muktamad & 1D Pelengkap Emas</p>
+            <p style="margin:0; font-weight:bold; color:#1a365d; font-size:14px; border-bottom:1px solid #cbd5e0; padding-bottom:5px; margin-bottom:8px;">🎯 Strategy Core: 3D Muktamad & 1D Pele[...]
             <span>🔥 1D Dominan (Hot): <span class="hot-num" id="h1D">-</span></span><br>
             <span>🧩 2D Tunjang: <span class="hot-num" id="h2D">-</span></span>
             <hr style="border-top:1px dashed #cbd5e0; margin:8px 0;">
@@ -480,11 +480,38 @@ function resetBorang() {
     globalHasil = null;
 }
 
-function salin(id) {
-    const txt = document.getElementById(id).getAttribute('data-raw');
-    if (txt) {
-        navigator.clipboard.writeText(txt).then(() => alert("Berhasil disalin: " + txt));
+function fallbackCopy(text) {
+    const temp = document.createElement('textarea');
+    temp.value = text;
+    temp.setAttribute('readonly', '');
+    temp.style.position = 'fixed';
+    temp.style.top = '-9999px';
+    document.body.appendChild(temp);
+    temp.select();
+
+    try {
+        const ok = document.execCommand('copy');
+        alert(ok ? 'Berhasil disalin: ' + text : 'Salin gagal. Sila salin manual:\n' + text);
+    } catch (err) {
+        alert('Salin gagal. Sila salin manual:\n' + text);
+    } finally {
+        document.body.removeChild(temp);
     }
+}
+
+function salin(id) {
+    const el = document.getElementById(id);
+    const txt = el ? el.getAttribute('data-raw') : '';
+    if (!txt) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt)
+            .then(() => alert('Berhasil disalin: ' + txt))
+            .catch(() => fallbackCopy(txt));
+        return;
+    }
+
+    fallbackCopy(txt);
 }
 </script>
 </body>
