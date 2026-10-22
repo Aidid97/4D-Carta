@@ -1,33 +1,143 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Versi Kosong</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      color: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .empty {
-      text-align: center;
-      padding: 24px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Matriks GD Lotto & Delta Core</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; color: #0056b3; }
+        label { font-weight: bold; }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background-color: #0056b3;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #004494; }
+        pre {
+            background-color: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="empty">
-    <h1>Versi Kosong</h1>
-  </div>
+
+    <h2>Analisis GD Lotto & Delta Core</h2>
+    
+    <label for="inputTarikh">Tarikh Cabutan (DD/MM/YY):</label>
+    <input type="text" id="inputTarikh" value="23/10/26" placeholder="Contoh: 23/10/26">
+    
+    <button onclick="laksanakanSistem()">Jana Analisis</button>
+
+    <div id="ruangPaparan" style="display: none;">
+        <pre id="outputSkrin"></pre>
+    </div>
+
+    <script>
+        // --- 1. Fungsi Penjana Matriks Asas & Bayangan ---
+        function janaCartaGDLotto(tarikh) {
+            const bahagian = tarikh.split('/');
+            const D1 = parseInt(bahagian[0][0]), D2 = parseInt(bahagian[0][1]);
+            const M1 = parseInt(bahagian[1][0]), M2 = parseInt(bahagian[1][1]);
+            const Y1 = parseInt(bahagian[2][0]), Y2 = parseInt(bahagian[2][1]);
+
+            const b1_1 = (D1 + D2) % 10, b1_2 = (Y1 + Y2) % 10, b1_3 = Y1;
+            const b2_1 = M1, b2_2 = M2, b2_3 = (D1 + D2 + M1) % 10;
+            const b3_1 = D2, b3_2 = (b1_1 + M1 + Y1) % 10, b3_3 = Math.abs(D2 - Y1);
+
+            const matriksUtama = [
+                [b1_1, b1_2, b1_3],
+                [b2_1, b2_2, b2_3],
+                [b3_1, b3_2, b3_3]
+            ];
+
+            const matriksBayangan = matriksUtama.map(baris => baris.map(digit => (digit + 5) % 10));
+
+            const semuaDigitWujud = new Set();
+            matriksUtama.forEach(baris => baris.forEach(d => semuaDigitWujud.add(d)));
+            
+            const digitHilang = [];
+            for (let i = 0; i <= 9; i++) {
+                if (!semuaDigitWujud.has(i)) digitHilang.push(i);
+            }
+
+            return { tarikh, matriksUtama, matriksBayangan, digitHilang };
+        }
+
+        // --- 2. Modul Delta Core Technology ---
+        function prosesDeltaCore(dataCarta) {
+            const { matriksUtama, matriksBayangan, digitHilang } = dataCarta;
+            const kunciMaster1D = matriksUtama[1][1]; 
+            const kunciKembar3D = digitHilang.map(digit => `${kunciMaster1D}${digit}${digit}`);
+            
+            const silangKiriAtas = `${matriksBayangan[0][0]}${matriksBayangan[1][1]}${matriksBayangan[2][2]}`;
+            const silangKananAtas = `${matriksBayangan[0][2]}${matriksBayangan[1][1]}${matriksBayangan[2][0]}`;
+
+            return { kunci1D: kunciMaster1D, lockKembar3D: kunciKembar3D, parameterBayangan: [silangKiriAtas, silangKananAtas] };
+        }
+
+        // --- 3. Pengendali Acara (Event Handler) untuk Butang HTML ---
+        function laksanakanSistem() {
+            const inputTarikh = document.getElementById("inputTarikh").value;
+            if (!inputTarikh) {
+                alert("Sila masukkan tarikh!");
+                return;
+            }
+
+            // Jalankan fungsi pengiraan
+            const dataMatriksDasar = janaCartaGDLotto(inputTarikh);
+            const hasilDeltaCore = prosesDeltaCore(dataMatriksDasar);
+
+            // Format paparan output ke skrin (UI)
+            let teksOutput = `TARIKH CABUTAN: ${dataMatriksDasar.tarikh}\n`;
+            teksOutput += `====================================\n\n`;
+            
+            teksOutput += `[ MATRIKS UTAMA ]\n`;
+            dataMatriksDasar.matriksUtama.forEach(baris => { teksOutput += `  ${baris.join('  ')}\n`; });
+            
+            teksOutput += `\n[ DIGIT HILANG (TWIN TARGET) ]\n`;
+            teksOutput += `  ${dataMatriksDasar.digitHilang.join(', ')}\n\n`;
+            
+            teksOutput += `====================================\n`;
+            teksOutput += `[ PARAMETER DELTA CORE ]\n`;
+            teksOutput += `  Kunci 1D (Center) : ${hasilDeltaCore.kunci1D}\n`;
+            teksOutput += `  Lock Kembar 3D    : ${hasilDeltaCore.lockKembar3D.join(', ')}\n`;
+            teksOutput += `  Pepenjuru Bayangan: ${hasilDeltaCore.parameterBayangan.join(' & ')}\n`;
+
+            // Cetak ke div ruangPaparan
+            document.getElementById("outputSkrin").innerText = teksOutput;
+            document.getElementById("ruangPaparan").style.display = "block";
+        }
+    </script>
 </body>
 </html>
