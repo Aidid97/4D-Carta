@@ -3,141 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Matriks GD Lotto & Delta Core</title>
+    <title>Sistem Analisis Carta Matriks 4D (Dragon)</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            max-width: 500px;
-            margin: 40px auto;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
             padding: 20px;
-            background: white;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        h2 { text-align: center; color: #0056b3; }
-        label { font-weight: bold; }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        input {
+            padding: 8px;
             font-size: 16px;
+            width: 150px;
+            text-align: center;
         }
         button {
-            width: 100%;
-            background-color: #0056b3;
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #27ae60;
             color: white;
-            padding: 12px;
             border: none;
             border-radius: 4px;
-            font-size: 16px;
             cursor: pointer;
-            font-weight: bold;
         }
-        button:hover { background-color: #004494; }
-        pre {
-            background-color: #272822;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-size: 14px;
+        button:hover {
+            background-color: #219653;
+        }
+        .matrix-box {
             margin-top: 20px;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .matrix-row {
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 5px;
+            margin: 8px 0;
+            text-align: center;
+            background: #fff;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .results {
+            margin-top: 20px;
+            background: #e8f8f5;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 5px solid #27ae60;
         }
     </style>
 </head>
 <body>
 
-    <h2>Analisis GD Lotto & Delta Core</h2>
+<div class="container">
+    <h2>Kalkulator Carta Matriks 4D</h2>
     
-    <label for="inputTarikh">Tarikh Cabutan (DD/MM/YY):</label>
-    <input type="text" id="inputTarikh" value="23/10/26" placeholder="Contoh: 23/10/26">
-    
-    <button onclick="laksanakanSistem()">Jana Analisis</button>
-
-    <div id="ruangPaparan" style="display: none;">
-        <pre id="outputSkrin"></pre>
+    <div class="input-group">
+        <label for="seedInput">Masukkan Benih (4 Digit):</label><br><br>
+        <input type="text" id="seedInput" value="2746" maxlength="4">
+        <button onclick="generateChart()">Jana Carta</button>
     </div>
 
-    <script>
-        // --- 1. Fungsi Penjana Matriks Asas & Bayangan ---
-        function janaCartaGDLotto(tarikh) {
-            const bahagian = tarikh.split('/');
-            const D1 = parseInt(bahagian[0][0]), D2 = parseInt(bahagian[0][1]);
-            const M1 = parseInt(bahagian[1][0]), M2 = parseInt(bahagian[1][1]);
-            const Y1 = parseInt(bahagian[2][0]), Y2 = parseInt(bahagian[2][1]);
+    <div class="matrix-box">
+        <h3 style="text-align: center; margin-top: 0;">Kotak 1 (Matriks Utama +3)</h3>
+        <div id="kotak1Result"></div>
+    </div>
 
-            const b1_1 = (D1 + D2) % 10, b1_2 = (Y1 + Y2) % 10, b1_3 = Y1;
-            const b2_1 = M1, b2_2 = M2, b2_3 = (D1 + D2 + M1) % 10;
-            const b3_1 = D2, b3_2 = (b1_1 + M1 + Y1) % 10, b3_3 = Math.abs(D2 - Y1);
+    <div class="matrix-box">
+        <h3 style="text-align: center; margin-top: 0;">Kotak 2 (Matriks Cermin +5)</h3>
+        <div id="kotak2Result"></div>
+    </div>
 
-            const matriksUtama = [
-                [b1_1, b1_2, b1_3],
-                [b2_1, b2_2, b2_3],
-                [b3_1, b3_2, b3_3]
-            ];
+    <div class="results" id="extractResult">
+        <!-- Titik Persamaan 2D & 3D akan dipaparkan di sini -->
+    </div>
+</div>
 
-            const matriksBayangan = matriksUtama.map(baris => baris.map(digit => (digit + 5) % 10));
+<script>
+function generateChart() {
+    let inputVal = document.getElementById("seedInput").value;
+    
+    // Pastikan input adalah 4 digit
+    if (inputVal.length !== 4 || isNaN(inputVal)) {
+        alert("Sila masukkan tepat 4 digit nombor benih!");
+        return;
+    }
 
-            const semuaDigitWujud = new Set();
-            matriksUtama.forEach(baris => baris.forEach(d => semuaDigitWujud.add(d)));
-            
-            const digitHilang = [];
-            for (let i = 0; i <= 9; i++) {
-                if (!semuaDigitWujud.has(i)) digitHilang.push(i);
-            }
+    let seedRow = inputVal.split("").map(Number);
+    let rows = 4;
+    let cols = 4;
+    
+    let kotak1 = [];
+    let kotak2 = [];
 
-            return { tarikh, matriksUtama, matriksBayangan, digitHilang };
+    // Baris 1 Kotak 1
+    kotak1.push(seedRow);
+
+    // Jana Kotak 1 (+3 Modulo 10)
+    for (let i = 1; i < rows; i++) {
+        let currentRow = [];
+        for (let j = 0; j < cols; j++) {
+            let newVal = (kotak1[i - 1][j] + 3) % 10;
+            currentRow.push(newVal);
         }
+        kotak1.push(currentRow);
+    }
 
-        // --- 2. Modul Delta Core Technology ---
-        function prosesDeltaCore(dataCarta) {
-            const { matriksUtama, matriksBayangan, digitHilang } = dataCarta;
-            const kunciMaster1D = matriksUtama[1][1]; 
-            const kunciKembar3D = digitHilang.map(digit => `${kunciMaster1D}${digit}${digit}`);
-            
-            const silangKiriAtas = `${matriksBayangan[0][0]}${matriksBayangan[1][1]}${matriksBayangan[2][2]}`;
-            const silangKananAtas = `${matriksBayangan[0][2]}${matriksBayangan[1][1]}${matriksBayangan[2][0]}`;
-
-            return { kunci1D: kunciMaster1D, lockKembar3D: kunciKembar3D, parameterBayangan: [silangKiriAtas, silangKananAtas] };
+    // Jana Kotak 2 (+5 Indeks Bayangan / Cermin)
+    for (let i = 0; i < rows; i++) {
+        let currentMirrorRow = [];
+        for (let j = 0; j < cols; j++) {
+            let mirrorVal = (kotak1[i][j] + 5) % 10;
+            currentMirrorRow.push(mirrorVal);
         }
+        kotak2.push(currentMirrorRow);
+    }
 
-        // --- 3. Pengendali Acara (Event Handler) untuk Butang HTML ---
-        function laksanakanSistem() {
-            const inputTarikh = document.getElementById("inputTarikh").value;
-            if (!inputTarikh) {
-                alert("Sila masukkan tarikh!");
-                return;
-            }
+    // Paparkan Kotak 1
+    let k1HTML = "";
+    for (let i = 0; i < rows; i++) {
+        k1HTML += `<div class="matrix-row">Baris ${i+1}: ${kotak1[i].join("  ")}</div>`;
+    }
+    document.getElementById("kotak1Result").innerHTML = k1HTML;
 
-            // Jalankan fungsi pengiraan
-            const dataMatriksDasar = janaCartaGDLotto(inputTarikh);
-            const hasilDeltaCore = prosesDeltaCore(dataMatriksDasar);
+    // Paparkan Kotak 2
+    let k2HTML = "";
+    for (let i = 0; i < rows; i++) {
+        k2HTML += `<div class="matrix-row">Baris ${i+1}: ${kotak2[i].join("  ")}</div>`;
+    }
+    document.getElementById("kotak2Result").innerHTML = k2HTML;
 
-            // Format paparan output ke skrin (UI)
-            let teksOutput = `TARIKH CABUTAN: ${dataMatriksDasar.tarikh}\n`;
-            teksOutput += `====================================\n\n`;
-            
-            teksOutput += `[ MATRIKS UTAMA ]\n`;
-            dataMatriksDasar.matriksUtama.forEach(baris => { teksOutput += `  ${baris.join('  ')}\n`; });
-            
-            teksOutput += `\n[ DIGIT HILANG (TWIN TARGET) ]\n`;
-            teksOutput += `  ${dataMatriksDasar.digitHilang.join(', ')}\n\n`;
-            
-            teksOutput += `====================================\n`;
-            teksOutput += `[ PARAMETER DELTA CORE ]\n`;
-            teksOutput += `  Kunci 1D (Center) : ${hasilDeltaCore.kunci1D}\n`;
-            teksOutput += `  Lock Kembar 3D    : ${hasilDeltaCore.lockKembar3D.join(', ')}\n`;
-            teksOutput += `  Pepenjuru Bayangan: ${hasilDeltaCore.parameterBayangan.join(' & ')}\n`;
+    // Paparkan Pengekstrakan Titik Persamaan 2D & 3D
+    let d2_1 = "" + kotak1[0][0] + kotak1[0][1];
+    let d2_2 = "" + kotak1[1][0] + kotak1[1][1];
+    let d3_1 = "" + kotak1[0][0] + kotak1[0][1] + kotak1[0][2];
+    let d3_2 = "" + kotak1[1][0] + kotak1[1][1] + kotak1[1][2];
 
-            // Cetak ke div ruangPaparan
-            document.getElementById("outputSkrin").innerText = teksOutput;
-            document.getElementById("ruangPaparan").style.display = "block";
-        }
-    </script>
+    let extractHTML = `
+        <h3 style="margin-top:0;">Titik Persamaan 2D & 3D Pilihan:</h3>
+        <p><b>Pilihan Kepala 2D Utama :</b> ${d2_1}, ${d2_2}</p>
+        <p><b>Pilihan 3D Melintang    :</b> ${d3_1}, ${d3_2}</p>
+    `;
+    document.getElementById("extractResult").innerHTML = extractHTML;
+}
+
+// Jalankan fungsi secara automatik semasa mula muat turun
+window.onload = function() {
+    generateChart();
+};
+</script>
+
 </body>
 </html>
